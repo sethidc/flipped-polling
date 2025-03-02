@@ -3,7 +3,7 @@
 Plugin Name: Flipped Polling
 Description: A feature-rich polling plugin with multiple polls, custom designs, stats, and more.
 Version: 3.0
-Author: Sethi DeClercq
+Author: Sethi De Clercq
 Author URI: https://sethideclercq.com
 License: GPL-2.0+
 Requires PHP: 7.0

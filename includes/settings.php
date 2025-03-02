@@ -61,7 +61,7 @@ function flipped_polling_styles() {
     $css .= ".flipped-poll-classic h3, .flipped-poll-modern h3, .flipped-poll-bold h3, .flipped-poll-minimal h3, .flipped-poll-dark h3 { color: " . esc_attr($settings['primary_color']) . "; }";
     $css .= '.poll-result { margin: 10px 0; } .poll-bar { height: 10px; transition: width 0.3s ease; }';
     $css .= '.poll-category { font-style: italic; color: #666; }';
-    $css .= $settings['custom_css']; // Already sanitized with wp_strip_all_tags
+    $css .= $settings['custom_css'];
     wp_add_inline_style('wp-admin', $css);
 }
 add_action('wp_enqueue_scripts', 'flipped_polling_styles');

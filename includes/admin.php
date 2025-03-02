@@ -183,8 +183,9 @@ function flipped_polling_add() {
 function flipped_polling_stats() {
     $polls = get_option('flipped_polls', []);
     $poll_id = isset($_GET['poll_id']) ? intval($_GET['poll_id']) : null;
+    $reset_message = '';
 
-    // Handle resets before output
+    // Handle resets without redirect
     if (isset($_GET['reset_votes']) && check_admin_referer('reset_votes_' . $poll_id)) {
         if (isset($polls[$poll_id])) {
             delete_option("flipped_poll_votes_$poll_id");
@@ -199,8 +200,7 @@ function flipped_polling_stats() {
                     update_user_meta($user_id, 'flipped_poll_votes', array_values($user_votes));
                 }
             }
-            wp_redirect(admin_url('admin.php?page=flipped-polling-stats&poll_id=' . $poll_id));
-            exit;
+            $reset_message = '<div class="updated"><p>' . esc_html__('Votes reset successfully.', 'flipped-polling') . '</p></div>';
         }
     }
 
@@ -237,6 +237,7 @@ function flipped_polling_stats() {
     $options = explode("\n", trim($poll['options']));
     ?>
     <div class="wrap">
+        <?php echo $reset_message; // Display reset message if applicable ?>
         <h1><?php /* translators: %s is the poll question */ printf(esc_html__('Stats for Poll: %s', 'flipped-polling'), esc_html($poll['question'])); ?></h1>
         <p><?php /* translators: %d is the total number of votes */ printf(esc_html__('Total Votes: %d', 'flipped-polling'), esc_html($total_votes)); ?></p>
         <?php if ($total_votes > 0) : ?>

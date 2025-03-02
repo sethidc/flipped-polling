@@ -1,5 +1,4 @@
 <?php
-// Admin menu and pages
 function flipped_polling_menu() {
     add_menu_page('Flipped Polling', 'Flipped Polling', 'manage_options', 'flipped-polling', 'flipped_polling_manage', 'dashicons-chart-bar', 80);
     add_submenu_page('flipped-polling', 'Manage Polls', 'Manage Polls', 'manage_options', 'flipped-polling', 'flipped_polling_manage');
@@ -12,7 +11,6 @@ add_action('admin_menu', 'flipped_polling_menu');
 function flipped_polling_manage() {
     $polls = get_option('flipped_polls', []);
 
-    // Handle deletion
     if (isset($_GET['delete']) && isset($_GET['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nonce'])), 'delete_poll_' . (int) $_GET['delete'])) {
         $id = (int) $_GET['delete'];
         if (isset($polls[$id])) {
@@ -25,7 +23,6 @@ function flipped_polling_manage() {
         }
     }
 
-    // Handle duplication
     if (isset($_GET['duplicate']) && isset($_GET['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nonce'])), 'duplicate_poll_' . (int) $_GET['duplicate'])) {
         $id = (int) $_GET['duplicate'];
         if (isset($polls[$id])) {
@@ -186,7 +183,6 @@ function flipped_polling_stats() {
         return;
     }
 
-    // Handle CSV export with WP_Filesystem
     if (isset($_GET['export']) && isset($_GET['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nonce'])), 'export_stats_' . $poll_id)) {
         $votes = get_option("flipped_poll_votes_$poll_id", []);
         require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -205,7 +201,6 @@ function flipped_polling_stats() {
         exit;
     }
 
-    // Handle vote reset
     if (isset($_GET['reset_votes']) && isset($_GET['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['nonce'])), 'reset_votes_' . $poll_id)) {
         delete_option("flipped_poll_votes_$poll_id");
         delete_option("flipped_poll_voters_$poll_id");
@@ -219,8 +214,8 @@ function flipped_polling_stats() {
     $options = explode("\n", trim($poll['options']));
     ?>
     <div class="wrap">
-        <h1><?php printf(esc_html__('Stats for Poll: %s', 'flipped-polling'), esc_html($poll['question'])); ?></h1>
-        <p><?php printf(esc_html__('Total Votes: %d', 'flipped-polling'), esc_html($total_votes)); ?></p>
+        <h1><?php /* translators: %s is the poll question */ printf(esc_html__('Stats for Poll: %s', 'flipped-polling'), esc_html($poll['question'])); ?></h1>
+        <p><?php /* translators: %d is the total number of votes */ printf(esc_html__('Total Votes: %d', 'flipped-polling'), esc_html($total_votes)); ?></p>
         <?php if ($total_votes > 0) : ?>
             <table class="wp-list-table widefat fixed striped">
                 <thead>

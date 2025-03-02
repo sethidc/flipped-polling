@@ -179,6 +179,7 @@ function flipped_polling_stats() {
             delete_option("flipped_poll_votes_$poll_id");
             delete_option("flipped_poll_voters_$poll_id");
             setcookie("flipped_poll_voted_$poll_id", '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN); // Clear cookie
+            unset($_COOKIE["flipped_poll_voted_$poll_id"]); // Ensure cookie is unset for current request
             if (is_user_logged_in()) {
                 $user_id = get_current_user_id();
                 $user_votes = get_user_meta($user_id, 'flipped_poll_votes', true) ?: [];
@@ -231,3 +232,31 @@ function flipped_polling_stats() {
         <h1><?php /* translators: %s is the poll question */ printf(esc_html__('Stats for Poll: %s', 'flipped-polling'), esc_html($poll['question'])); ?></h1>
         <p><?php /* translators: %d is the total number of votes */ printf(esc_html__('Total Votes: %d', 'flipped-polling'), esc_html($total_votes)); ?></p>
         <?php if ($total_votes > 0) : ?>
+            <table class="wp-list-table widefat fixed striped">
+                <thead>
+                    <tr>
+                        <th><?php echo esc_html__('Option', 'flipped-polling'); ?></th>
+                        <th><?php echo esc_html__('Votes', 'flipped-polling'); ?></th>
+                        <th><?php echo esc_html__('Percentage', 'flipped-polling'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($options as $option) : $option = trim($option); if (!empty($option)) : ?>
+                        <tr>
+                            <td><?php echo esc_html($option); ?></td>
+                            <td><?php echo esc_html(isset($votes[$option]) ? $votes[$option] : 0); ?></td>
+                            <td><?php echo esc_html($total_votes > 0 ? round((isset($votes[$option]) ? $votes[$option] : 0) / $total_votes * 100, 2) : 0); ?>%</td>
+                        </tr>
+                    <?php endif; endforeach; ?>
+                </tbody>
+            </table>
+            <p>
+                <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=flipped-polling-stats&poll_id=' . $poll_id . '&reset_votes=1'), 'reset_votes_' . $poll_id, 'nonce')); ?>" onclick="return confirm('<?php echo esc_js(__('Reset all votes for this poll?', 'flipped-polling')); ?>');"><?php echo esc_html__('Reset Votes', 'flipped-polling'); ?></a> |
+                <a href="<?php echo esc_url(wp_nonce_url(admin_url('admin.php?page=flipped-polling-stats&poll_id=' . $poll_id . '&export=1'), 'export_stats_' . $poll_id, 'nonce')); ?>"><?php echo esc_html__('Export CSV', 'flipped-polling'); ?></a>
+            </p>
+        <?php else : ?>
+            <p><?php echo esc_html__('No votes yet.', 'flipped-polling'); ?></p>
+        <?php endif; ?>
+    </div>
+    <?php
+}

@@ -34,5 +34,11 @@ function flipped_polling_enqueue_assets() {
         'nonce' => wp_create_nonce('flipped_polling_vote')
     ]);
 }
+
+function flipped_polling_load_textdomain() {
+    load_plugin_textdomain('flipped-polling', false, dirname(plugin_basename(__FILE__)) . '/languages');
+}
+add_action('plugins_loaded', 'flipped_polling_load_textdomain');
+
 add_action('wp_enqueue_scripts', 'flipped_polling_enqueue_assets');
 add_action('admin_enqueue_scripts', 'flipped_polling_enqueue_assets');

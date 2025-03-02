@@ -19,12 +19,6 @@ function flipped_poll_shortcode($atts) {
     $votes = get_option("flipped_poll_votes_$id", []);
     $has_voted = flipped_polling_has_voted($id, $settings, $user_id);
 
-    // Debug log initial state
-    if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
-        error_log("Flipped Polling: Initial check for poll ID $id, restriction: " . $settings['vote_restriction'] . ", has_voted: " . ($has_voted ? 'true' : 'false'));
-    }
-
-    // Non-AJAX vote handling with nonce
     if (isset($_POST['flipped_poll_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['flipped_poll_nonce'])), 'flipped_poll_vote_' . $id)) {
         $vote_key = 'poll_vote_' . $id;
         if (isset($_POST[$vote_key]) && !$has_voted) {
@@ -39,16 +33,7 @@ function flipped_poll_shortcode($atts) {
                 }
                 update_option("flipped_poll_votes_$id", $votes);
                 flipped_polling_record_vote($id, $settings, $user_id);
-
-                // Re-check has_voted immediately after recording
                 $has_voted = flipped_polling_has_voted($id, $settings, $user_id);
-
-                // Debug log after vote
-                if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
-                    error_log("Flipped Polling: Vote recorded for poll ID $id, restriction: " . $settings['vote_restriction'] . ", has_voted after: " . ($has_voted ? 'true' : 'false'));
-                }
-
-                // Redirect to prevent form resubmission (POST/GET pattern)
                 wp_redirect(esc_url_raw(add_query_arg('poll_voted', $id, wp_get_referer())));
                 exit;
             }
@@ -130,12 +115,6 @@ function flipped_polling_ajax_vote() {
         }
         update_option("flipped_poll_votes_$id", $votes);
         flipped_polling_record_vote($id, $settings, $user_id);
-
-        // Debug log AJAX vote
-        if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
-            error_log("Flipped Polling: AJAX vote recorded for poll ID $id, restriction: " . $settings['vote_restriction'] . ", has_voted: " . (flipped_polling_has_voted($id, $settings, $user_id) ? 'true' : 'false'));
-        }
-
         wp_send_json_success(flipped_poll_shortcode(['id' => $id]));
     }
     wp_send_json_error(esc_html__('You have already voted.', 'flipped-polling'));
@@ -153,13 +132,13 @@ function flipped_polling_has_voted($id, $settings, $user_id) {
         $user_votes = get_user_meta($user_id, 'flipped_poll_votes', true);
         return !empty($user_votes) && in_array($id, $user_votes);
     }
-    return false; // 'none' allows multiple votes, but we still track for consistency
+    return false;
 }
 
 function flipped_polling_record_vote($id, $settings, $user_id) {
     if ($settings['vote_restriction'] === 'cookie') {
         setcookie("flipped_poll_voted_$id", '1', time() + 3600 * 24 * 30, COOKIEPATH, COOKIE_DOMAIN);
-        $_COOKIE["flipped_poll_voted_$id"] = '1'; // Set cookie immediately for current request
+        $_COOKIE["flipped_poll_voted_$id"] = '1';
     } elseif ($settings['vote_restriction'] === 'ip') {
         $ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '';
         $voters = get_option("flipped_poll_voters_$id", []);

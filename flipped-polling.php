@@ -1,13 +1,13 @@
 <?php
 /*
-Plugin Name: Flipped Polling
-Description: A feature-rich polling plugin with multiple polls, custom designs, stats, and more.
-Version: 3.0
-Author: Sethi De Clercq
-Author URI: https://sethideclercq.com
-License: GPL-2.0+
-Requires PHP: 7.0
-Text Domain: flipped-polling
+ * Plugin Name: Flipped Polling
+ * Description: A feature-rich polling plugin with multiple polls, custom designs, stats, and more.
+ * Version: 3.0
+ * Author: Sethi DeClercq
+ * Author URI: https://sethideclercq.com/wp-plugins
+ * License: GPL-2.0+
+ * Requires PHP: 7.0
+ * Text Domain: flipped-polling
 */
 
 // Prevent direct access
@@ -20,7 +20,7 @@ define('FLIPPED_POLLING_VERSION', '3.0');
 define('FLIPPED_POLLING_DIR', plugin_dir_path(__FILE__));
 define('FLIPPED_POLLING_URL', plugin_dir_url(__FILE__));
 
-// Load text domain
+// Load text domain for translations
 function flipped_polling_load_textdomain() {
     load_plugin_textdomain('flipped-polling', false, dirname(plugin_basename(__FILE__)) . '/languages');
 }

@@ -1,14 +1,14 @@
-# Flipped Polling
+# Flipped Polling  
 
-**Contributors:** sethidc
-**Donate link:** [https://wise.com/pay/me/sethid](https://wise.com/pay/me/sethid)
-**Tags:** polls, voting, survey, statistics
-**Requires at least:** 5.0
-**Tested up to:** 6.7.2
-**Stable tag:** 3.0
-**Requires PHP:** 7.0
-**License:** GPLv2 or later
-**License URI:** [http://www.gnu.org/licenses/gpl-2.0.html](http://www.gnu.org/licenses/gpl-2.0.html)
+**Contributors:** sethidc  
+**Donate link:** [https://wise.com/pay/me/sethid](https://wise.com/pay/me/sethid)  
+**Tags:** polls, voting, survey, statistics  
+**Requires at least:** 5.0  
+**Tested up to:** 6.7.2  
+**Stable tag:** 3.0  
+**Requires PHP:** 7.0  
+**License:** GPLv2 or later  
+**License URI:** [http://www.gnu.org/licenses/gpl-2.0.html](http://www.gnu.org/licenses/gpl-2.0.html)  
 
 A feature-rich polling plugin for WordPress with multiple polls, custom designs, stats, and more.
 

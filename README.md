@@ -66,4 +66,4 @@ Visit "Poll Stats," select a poll, and click "Export CSV."
 
 ### 3.0
 
-This is the first public version, packed with features for robust polling functionality.
+This is the first public version, packed with basic features to get started with robust polling functionality.

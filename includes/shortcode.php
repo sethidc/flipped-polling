@@ -1,7 +1,7 @@
 <?php
 function flipped_poll_shortcode($atts) {
     $atts = shortcode_atts(['id' => 0], $atts, 'flipped_poll');
-    $id = (int) $atts['id']; // Sanitized as integer
+    $id = (int) $atts['id'];
     $polls = get_option('flipped_polls', []);
     if (!isset($polls[$id])) {
         return '<p>' . esc_html__('Poll not found.', 'flipped-polling') . '</p>';
@@ -9,7 +9,7 @@ function flipped_poll_shortcode($atts) {
 
     $poll = $polls[$id];
     $settings = get_option('flipped_poll_settings', ['vote_restriction' => 'cookie']);
-    $current_date = gmdate('Y-m-d'); // Using gmdate() instead of date()
+    $current_date = gmdate('Y-m-d');
     $user_id = get_current_user_id();
 
     if (($poll['open_date'] && $current_date < $poll['open_date']) || ($poll['close_date'] && $current_date > $poll['close_date'])) {
@@ -19,7 +19,6 @@ function flipped_poll_shortcode($atts) {
     $votes = get_option("flipped_poll_votes_$id", []);
     $has_voted = flipped_polling_has_voted($id, $settings, $user_id);
 
-    // Non-AJAX vote handling with nonce
     if (isset($_POST['flipped_poll_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['flipped_poll_nonce'])), 'flipped_poll_vote_' . $id)) {
         $vote_key = 'poll_vote_' . $id;
         if (isset($_POST[$vote_key]) && !$has_voted) {
@@ -70,6 +69,7 @@ function flipped_poll_shortcode($atts) {
         <?php endif; ?>
 
         <?php if ($poll['show_results'] === 'before' || ($poll['show_results'] === 'after' && $has_voted)) : ?>
+            <?php /* translators: %d is the total number of votes */ ?>
             <h4><?php printf(esc_html__('Results (%d votes):', 'flipped-polling'), esc_html(array_sum($votes))); ?></h4>
             <?php foreach (explode("\n", trim($poll['options'])) as $option) : $option = trim($option); if (!empty($option)) : 
                 $vote_count = isset($votes[$option]) ? $votes[$option] : 0;
@@ -77,7 +77,8 @@ function flipped_poll_shortcode($atts) {
                 $percentage = $total_votes > 0 ? round(($vote_count / $total_votes) * 100, 2) : 0;
             ?>
                 <div class="poll-result">
-                    <p><?php printf(esc_html__('%s: %d votes (%s%%)', 'flipped-polling'), esc_html($option), esc_html($vote_count), esc_html($percentage)); ?></p>
+                    <?php /* translators: %1$s is the option name, %2$d is the vote count, %3$s is the percentage */ ?>
+                    <p><?php printf(esc_html__('%1$s: %2$d votes (%3$s%%)', 'flipped-polling'), esc_html($option), esc_html($vote_count), esc_html($percentage)); ?></p>
                     <div class="poll-bar" style="width: <?php echo esc_attr($percentage); ?>%; background: #<?php echo esc_attr(substr(md5($option), 0, 6)); ?>;"></div>
                 </div>
             <?php endif; endforeach; ?>
@@ -88,7 +89,6 @@ function flipped_poll_shortcode($atts) {
 }
 add_shortcode('flipped_poll', 'flipped_poll_shortcode');
 
-// AJAX voting handler
 function flipped_polling_ajax_vote() {
     check_ajax_referer('flipped_polling_vote', 'nonce');
     $id = isset($_POST['poll_id']) ? (int) $_POST['poll_id'] : 0;
@@ -118,7 +118,6 @@ function flipped_polling_ajax_vote() {
 add_action('wp_ajax_flipped_polling_vote', 'flipped_polling_ajax_vote');
 add_action('wp_ajax_nopriv_flipped_polling_vote', 'flipped_polling_ajax_vote');
 
-// Voting check and recording functions
 function flipped_polling_has_voted($id, $settings, $user_id) {
     if ($settings['vote_restriction'] === 'cookie') {
         return isset($_COOKIE["flipped_poll_voted_$id"]);

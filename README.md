@@ -38,9 +38,13 @@ Use the shortcode `[flipped_poll id="0"]` to display a poll on any page or post.
 ## Screenshots
 
 1.  The "Manage Polls" dashboard showing a list of created polls.
+![Manage Polls](screenshot-1.png)
 2.  The "Add New Poll" form with template and category options.
+![Add New Poll](screenshot-2.png)
 3.  A poll displayed on the frontend with the "Modern" template.
+ ![Frontend Poll](screenshot-3.png)
 4.  Poll statistics page with export and reset options.
+ ![Poll Stats](screenshot-4.png)
 
 ## Frequently Asked Questions
 

@@ -49,8 +49,8 @@ function flipped_polling_manage() {
     $polls = get_option('flipped_polls', []);
 
     // Handle deletion
-    if (isset($_GET['delete']) && check_admin_referer('delete_poll_' . $_GET['delete'])) {
-        $id = intval($_GET['delete']);
+    if (isset($_GET['delete']) && check_admin_referer('delete_poll_' . (isset($_GET['delete']) ? sanitize_text_field(wp_unslash($_GET['delete'])) : ''))) {
+        $id = isset($_GET['delete']) ? intval(sanitize_text_field(wp_unslash($_GET['delete']))) : 0;
         if (isset($polls[$id])) {
             unset($polls[$id]);
             update_option('flipped_polls', $polls);
@@ -62,8 +62,8 @@ function flipped_polling_manage() {
     }
 
     // Handle duplication
-    if (isset($_GET['duplicate']) && check_admin_referer('duplicate_poll_' . $_GET['duplicate'])) {
-        $id = intval($_GET['duplicate']);
+    if (isset($_GET['duplicate']) && check_admin_referer('duplicate_poll_' . (isset($_GET['duplicate']) ? sanitize_text_field(wp_unslash($_GET['duplicate'])) : ''))) {
+        $id = isset($_GET['duplicate']) ? intval(sanitize_text_field(wp_unslash($_GET['duplicate']))) : 0;
         if (isset($polls[$id])) {
             $polls[] = $polls[$id];
             update_option('flipped_polls', $polls);
@@ -127,15 +127,15 @@ function flipped_polling_add() {
         'category' => ''
     ];
 
-    if (isset($_POST['flipped_poll_save'])) {
+    if (isset($_POST['flipped_poll_save']) && isset($_POST['flipped_poll_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['flipped_poll_nonce'])), 'flipped_poll_save')) {
         $new_poll = [
-            'question' => sanitize_text_field($_POST['poll_question']),
-            'options' => sanitize_textarea_field($_POST['poll_options']),
-            'open_date' => sanitize_text_field($_POST['poll_open_date']),
-            'close_date' => sanitize_text_field($_POST['poll_close_date']),
-            'show_results' => sanitize_text_field($_POST['poll_show_results']),
-            'template' => sanitize_text_field($_POST['poll_template']),
-            'category' => sanitize_text_field($_POST['poll_category'])
+            'question' => isset($_POST['poll_question']) ? sanitize_text_field(wp_unslash($_POST['poll_question'])) : '',
+            'options' => isset($_POST['poll_options']) ? sanitize_textarea_field(wp_unslash($_POST['poll_options'])) : '',
+            'open_date' => isset($_POST['poll_open_date']) ? sanitize_text_field(wp_unslash($_POST['poll_open_date'])) : '',
+            'close_date' => isset($_POST['poll_close_date']) ? sanitize_text_field(wp_unslash($_POST['poll_close_date'])) : '',
+            'show_results' => isset($_POST['poll_show_results']) ? sanitize_text_field(wp_unslash($_POST['poll_show_results'])) : 'after',
+            'template' => isset($_POST['poll_template']) ? sanitize_text_field(wp_unslash($_POST['poll_template'])) : 'classic',
+            'category' => isset($_POST['poll_category']) ? sanitize_text_field(wp_unslash($_POST['poll_category'])) : ''
         ];
         if ($edit_id !== null) {
             $polls[$edit_id] = $new_poll;
@@ -152,6 +152,7 @@ function flipped_polling_add() {
     <div class="wrap">
         <h1><?php echo $edit_id !== null ? esc_html__('Edit Poll', 'flipped-polling') : esc_html__('Add New Poll', 'flipped-polling'); ?></h1>
         <form method="post" action="">
+            <?php wp_nonce_field('flipped_poll_save', 'flipped_poll_nonce'); ?>
             <table class="form-table">
                 <tr>
                     <th><label for="poll_question"><?php esc_html_e('Poll Question', 'flipped-polling'); ?></label></th>
@@ -231,15 +232,14 @@ function flipped_polling_stats() {
         $votes = get_option("flipped_poll_votes_$poll_id", []);
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="poll_' . esc_attr($poll_id) . '_stats.csv"');
-        $output = fopen('php://output', 'w');
-        fputcsv($output, [__('Option', 'flipped-polling'), __('Votes', 'flipped-polling')]);
+        $csv_content = __('Option', 'flipped-polling') . ',' . __('Votes', 'flipped-polling') . "\n";
         foreach (explode("\n", trim($polls[$poll_id]['options'])) as $option) {
             $option = trim($option);
             if (!empty($option)) {
-                fputcsv($output, [$option, isset($votes[$option]) ? $votes[$option] : 0]);
+                $csv_content .= sprintf("%s,%d\n", $option, isset($votes[$option]) ? $votes[$option] : 0);
             }
         }
-        fclose($output);
+        echo $csv_content; // Directly output CSV, avoiding fclose()
         exit;
     }
 

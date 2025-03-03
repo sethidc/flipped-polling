@@ -47,6 +47,7 @@ add_action('admin_menu', 'flipped_polling_menu');
 
 function flipped_polling_manage() {
     $polls = get_option('flipped_polls', []);
+    $message = '';
 
     // Handle deletion
     if (isset($_GET['delete']) && check_admin_referer('delete_poll_' . (isset($_GET['delete']) ? sanitize_text_field(wp_unslash($_GET['delete'])) : ''))) {
@@ -56,8 +57,7 @@ function flipped_polling_manage() {
             update_option('flipped_polls', $polls);
             delete_option("flipped_poll_votes_$id");
             delete_option("flipped_poll_voters_$id");
-            wp_redirect(admin_url('admin.php?page=flipped-polling'));
-            exit;
+            $message = '<div class="updated"><p>' . esc_html__('Poll deleted successfully.', 'flipped-polling') . '</p></div>';
         }
     }
 
@@ -67,13 +67,13 @@ function flipped_polling_manage() {
         if (isset($polls[$id])) {
             $polls[] = $polls[$id];
             update_option('flipped_polls', $polls);
-            wp_redirect(admin_url('admin.php?page=flipped-polling'));
-            exit;
+            $message = '<div class="updated"><p>' . esc_html__('Poll duplicated successfully.', 'flipped-polling') . '</p></div>';
         }
     }
 
     ?>
     <div class="wrap">
+        <?php echo $message; // Display success message if applicable ?>
         <h1><?php esc_html_e('Flipped Polling - Manage Polls', 'flipped-polling'); ?></h1>
         <?php if (empty($polls)) : ?>
             <p><?php esc_html_e('No polls created yet.', 'flipped-polling'); ?> <a href="<?php echo esc_url(admin_url('admin.php?page=flipped-polling-add')); ?>"><?php esc_html_e('Add a new poll', 'flipped-polling'); ?></a></p>

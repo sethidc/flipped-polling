@@ -239,7 +239,7 @@ function flipped_polling_stats() {
                 $csv_content .= sprintf("%s,%d\n", $option, isset($votes[$option]) ? $votes[$option] : 0);
             }
         }
-        echo $csv_content; // Directly output CSV, avoiding fclose()
+        echo esc_html($csv_content); // Escaped output for CSV
         exit;
     }
 

@@ -73,7 +73,7 @@ function flipped_polling_manage() {
 
     ?>
     <div class="wrap">
-        <?php echo $message; // Display success message if applicable ?>
+        <?php echo wp_kses_post($message); // Escaped with allowed HTML ?>
         <h1><?php esc_html_e('Flipped Polling - Manage Polls', 'flipped-polling'); ?></h1>
         <?php if (empty($polls)) : ?>
             <p><?php esc_html_e('No polls created yet.', 'flipped-polling'); ?> <a href="<?php echo esc_url(admin_url('admin.php?page=flipped-polling-add')); ?>"><?php esc_html_e('Add a new poll', 'flipped-polling'); ?></a></p>

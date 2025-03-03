@@ -10,9 +10,9 @@
 function flipped_polling_settings_page() {
     if (isset($_POST['flipped_poll_settings_save']) && isset($_POST['flipped_poll_settings_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['flipped_poll_settings_nonce'])), 'flipped_poll_settings_save')) {
         update_option('flipped_poll_settings', [
-            'vote_restriction' => sanitize_text_field(wp_unslash($_POST['vote_restriction'])),
-            'primary_color' => sanitize_hex_color(wp_unslash($_POST['primary_color'])),
-            'custom_css' => wp_strip_all_tags(wp_unslash($_POST['custom_css']), false)
+            'vote_restriction' => isset($_POST['vote_restriction']) ? sanitize_text_field(wp_unslash($_POST['vote_restriction'])) : 'cookie',
+            'primary_color' => isset($_POST['primary_color']) ? sanitize_hex_color(wp_unslash($_POST['primary_color'])) : '#0073aa',
+            'custom_css' => isset($_POST['custom_css']) ? wp_strip_all_tags(wp_unslash($_POST['custom_css']), false) : ''
         ]);
         echo '<div class="updated"><p>' . esc_html__('Settings saved!', 'flipped-polling') . '</p></div>';
     }
